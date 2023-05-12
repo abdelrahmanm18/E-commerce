@@ -1,0 +1,17 @@
+const conn = require("../db/db");
+const util = require("util"); // helper method
+
+const admin = async (req, res, next) => {
+  const query = util.promisify(conn.query).bind(conn); // to change my sql query to a promise that can be used with await async
+  const { token } = req.headers;
+  const admin = await query("select * from user where token = ?", [token]);
+  if (admin[0] && admin[0].role == "1") {
+    next();
+  } else {
+    res.status(403).json({
+      msg: "you are not authorized to access this role",
+    });
+  }
+};
+
+module.exports = admin;
